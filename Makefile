@@ -112,7 +112,7 @@ fips202.o: $(COMMONPATH)/fips202.c
 sha2.o: $(COMMONPATH)/sha2.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
-keccakf1600.o:  common/keccakf1600.S
+keccakf1600.o:  $(COMMONPATH)/keccakf1600.S
 	$(CC) $(CFLAGS) -o $@ -c $^
 
 stm32f4_wrapper.o:  $(COMMONPATH)/stm32f4_wrapper.c
