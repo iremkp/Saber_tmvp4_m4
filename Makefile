@@ -44,37 +44,37 @@ test-lightsaber.bin benchmark-lightsaber.bin stack-lightsaber.bin \
 test-firesaber.bin benchmark-firesaber.bin stack-firesaber.bin \
 benchmark-tmvp4_256_16.bin stack-tmvp4_256_16.bin 
 
-test-saber.elf: $(SABER_MULT) saber-test.o $(SABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
+test-saber.elf: $(SABER_MULT) $(OPENCM3FILE) saber-test.o $(SABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
 	$(LD) -o $@ $< saber-test.o $(SABER_OBJECTS) $(OBJECTS) $(LDFLAGS) -l$(OPENCM3NAME)
 
-benchmark-saber.elf: $(SABER_MULT) saber-speed.o $(SABER_OBJECTS) $(SOURCES) $(OBJECTS)  $(LDSCRIPT)
+benchmark-saber.elf: $(SABER_MULT) $(OPENCM3FILE) saber-speed.o $(SABER_OBJECTS) $(SOURCES) $(OBJECTS)  $(LDSCRIPT)
 	$(LD) -o $@ $< saber-speed.o $(SABER_OBJECTS) $(OBJECTS) $(LDFLAGS) -l$(OPENCM3NAME)
 
-stack-saber.elf: $(SABER_MULT) saber-stack.o $(SABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
+stack-saber.elf: $(SABER_MULT) $(OPENCM3FILE) saber-stack.o $(SABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
 	$(LD) -o $@ $< saber-stack.o $(SABER_OBJECTS) $(OBJECTS) $(LDFLAGS) -l$(OPENCM3NAME)
 	
-test-lightsaber.elf: $(SABER_MULT) lightsaber-test.o $(LIGHTSABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
+test-lightsaber.elf: $(SABER_MULT) $(OPENCM3FILE) lightsaber-test.o $(LIGHTSABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
 	$(LD) -o $@ $< lightsaber-test.o $(LIGHTSABER_OBJECTS) $(OBJECTS) $(LDFLAGS) -l$(OPENCM3NAME)
 
-benchmark-lightsaber.elf: $(SABER_MULT) lightsaber-speed.o $(LIGHTSABER_OBJECTS) $(SOURCES) $(OBJECTS)  $(LDSCRIPT)
+benchmark-lightsaber.elf: $(SABER_MULT) $(OPENCM3FILE) lightsaber-speed.o $(LIGHTSABER_OBJECTS) $(SOURCES) $(OBJECTS)  $(LDSCRIPT)
 	$(LD) -o $@ $< lightsaber-speed.o $(LIGHTSABER_OBJECTS) $(OBJECTS) $(LDFLAGS) -l$(OPENCM3NAME)
 
-stack-lightsaber.elf: $(SABER_MULT) lightsaber-stack.o $(LIGHTSABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
+stack-lightsaber.elf: $(SABER_MULT) $(OPENCM3FILE) lightsaber-stack.o $(LIGHTSABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
 	$(LD) -o $@ $< lightsaber-stack.o $(LIGHTSABER_OBJECTS) $(OBJECTS) $(LDFLAGS) -l$(OPENCM3NAME)
 	
-test-firesaber.elf: $(SABER_MULT) firesaber-test.o $(FIRESABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
+test-firesaber.elf: $(SABER_MULT) $(OPENCM3FILE) firesaber-test.o $(FIRESABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
 	$(LD) -o $@ $< firesaber-test.o $(FIRESABER_OBJECTS) $(OBJECTS) $(LDFLAGS) -l$(OPENCM3NAME)
 
-benchmark-firesaber.elf: $(SABER_MULT) firesaber-speed.o $(FIRESABER_OBJECTS) $(SOURCES) $(OBJECTS)  $(LDSCRIPT)
+benchmark-firesaber.elf: $(SABER_MULT) $(OPENCM3FILE) firesaber-speed.o $(FIRESABER_OBJECTS) $(SOURCES) $(OBJECTS)  $(LDSCRIPT)
 	$(LD) -o $@ $< firesaber-speed.o $(FIRESABER_OBJECTS) $(OBJECTS) $(LDFLAGS) -l$(OPENCM3NAME)
 
-stack-firesaber.elf: $(SABER_MULT) firesaber-stack.o $(FIRESABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
+stack-firesaber.elf: $(SABER_MULT) $(OPENCM3FILE) firesaber-stack.o $(FIRESABER_OBJECTS) $(SOURCES) $(OBJECTS) $(LDSCRIPT)
 	$(LD) -o $@ $< firesaber-stack.o $(FIRESABER_OBJECTS) $(OBJECTS) $(LDFLAGS) -l$(OPENCM3NAME)
 
-benchmark-tmvp4_256_16.elf: tmvp4_256_16.s benchmark-polymul_256_16.o $(SOURCES) $(OBJECTS) $(LDSCRIPT)
+benchmark-tmvp4_256_16.elf: $(SABER_MULT) $(OPENCM3FILE) benchmark-polymul_256_16.o $(SOURCES) $(OBJECTS) $(LDSCRIPT)
 	$(LD) -o $@ benchmark-polymul_256_16.o $(OBJECTS) $< $(LDFLAGS) -l$(OPENCM3NAME)	
 
-stack-tmvp4_256_16.elf: $(SABER_MULT) stack-polymul_256_16.o $(SOURCES) $(OBJECTS) $(LDSCRIPT)
+stack-tmvp4_256_16.elf: $(SABER_MULT) $(OPENCM3FILE) stack-polymul_256_16.o $(SOURCES) $(OBJECTS) $(LDSCRIPT)
 	$(LD) -o $@ stack-polymul_256_16.o $(OBJECTS) $< $(LDFLAGS) -l$(OPENCM3NAME)
 
 
@@ -118,6 +118,19 @@ keccakf1600.o:  common/keccakf1600.S
 stm32f4_wrapper.o:  $(COMMONPATH)/stm32f4_wrapper.c
 	$(CC) $(CFLAGS) -o $@ -c $^
 
+$(OPENCM3FILE):
+	@if [ -z $(shell ls -A $(OPENCM3DIR)) ] ; then \
+		printf "######## ERROR ########\n"; \
+		printf "\tlibopencm3 is not initialized.\n"; \
+		printf "\tPlease run (in the root directory):\n"; \
+		printf "\t$$ git submodule init\n"; \
+		printf "\t$$ git submodule update\n"; \
+		printf "\tbefore running make.\n"; \
+		printf "######## ERROR ########\n"; \
+		exit 1; \
+		fi
+	make -C $(OPENCM3DIR)
+
 .PHONY: clean
 .PRECIOUS: $(OBJECTS) mult%.s
 
@@ -128,3 +141,4 @@ clean:
 	-find SaberKEM -name '*.d' -delete
 	-rm -f *.bin
 	-rm -f *.elf
+
